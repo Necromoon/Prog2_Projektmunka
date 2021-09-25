@@ -1,3 +1,4 @@
 # Prog2_Projektmunka
 
-Python
+-Python(Pygame)
+-Felülnézetes(2D), lövöldözős játék
