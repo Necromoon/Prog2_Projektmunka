@@ -1,24 +1,45 @@
-RED = (255, 0, 0)
-YELLOW = (255, 255, 0)
-GREEN = (0, 255, 0)
+import pygame as pg
+
+# Colors
 BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-DARKGREY = (40, 40, 40)
-DG = DARKGREY
 LIGHTGREY = (100, 100, 100)
 LG = LIGHTGREY
 
-WIDTH = 1024
-HEIGHT = 768
 
+# SCREEN
+WIDTH = 1024
+W = WIDTH
+HEIGHT = 768
+H = HEIGHT
+
+
+# FPS
 FPS = 120
 
-PLAYER_SPEED = 300
 
+# Title and Background
 TITLE = "Projekt_Game"
-BGCOLOR = DG
+BGCOLOR = BLACK
 
-TILESIZE = 32
+
+TILESIZE = 64
 TS = TILESIZE
-GRIDWIDTH = WIDTH / TS
-GRIDHEIGHT = HEIGHT / TS
+GRIDWIDTH = W / TS
+GRIDHEIGHT = H / TS
+
+
+# Wall
+WALL_IMG = 'Wall.png'
+
+
+# Player
+PLAYER_SPEED = 300
+PLAYER_ROT_SPEED = 250
+PLAYER_IMG = 'Player.png'
+PLAYER_HIT_RECT = pg.Rect(0, 0, 35, 35)
+
+
+# Enemy
+ENEMY_IMG = 'Enemy.png'
+ENEMY_SPEED = 150
+ENEMY_HIT_RECT = pg.Rect(0, 0, 30, 30)
