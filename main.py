@@ -1,7 +1,25 @@
-mport sys
+import sys
 from os import path
 from sprites import *
 from tilemap import *
+
+
+def draw_player_health(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 100
+    BAR_HEIGHT = 20
+    fill = pct * BAR_LENGTH
+    outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    if pct > 0.6:
+        col = GREEN
+    elif pct > 0.3:
+        col = YELLOW
+    else:
+        col = RED
+    pg.draw.rect(surf, col, fill_rect)
+    pg.draw.rect(surf, WHITE, outline_rect, 2)
 
 
 # Game
@@ -17,6 +35,7 @@ class Game:
         game_folder = path.dirname(__file__)
         self.map = Map(path.join(game_folder, 'map.txt'))
         self.player_img = pg.image.load(path.join(game_folder, PLAYER_IMG)).convert_alpha()
+        self.bullet_img = pg.image.load(path.join(game_folder, BULLET_IMG)).convert_alpha()
         self.enemy_img = pg.image.load(path.join(game_folder, ENEMY_IMG)).convert_alpha()
         self.wall_img = pg.image.load(path.join(game_folder, WALL_IMG)).convert_alpha()
         self.wall_img = pg.transform.scale(self.wall_img, (TS, TS))
@@ -25,6 +44,7 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.enemies = pg.sprite.Group()
+        self.bullets = pg.sprite.Group()
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '*':
@@ -50,18 +70,27 @@ class Game:
     def update(self):
         self.all_sprites.update()
         self.camera.update(self.player)
-
-    def draw_grid(self):
-        for x in range(0, W, TS):
-            pg.draw.line(self.screen, LG, (x, 0), (x, H))
-        for y in range(0, H, TS):
-            pg.draw.line(self.screen, LG, (0, y), (W, y))
+        hits = pg.sprite.spritecollide(self.player, self.enemies, False, collide_hit_rect)
+        for hit in hits:
+            self.player.health -= ENEMY_DAMAGE
+            hit.vel = vec(0, 0)
+            if self.player.health <= 0:
+                self.playing = False
+        if hits:
+            self.player.pos += vec(ENEMY_KNOCKBACK, 0).rotate(-hits[0].rot)
+        hits = pg.sprite.groupcollide(self.enemies, self.bullets, False, True)
+        for hit in hits:
+            hit.health -= BULLET_DAMAGE
+            hit.vel = vec(0, 0)
 
     def draw(self):
         pg.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         self.screen.fill(BGCOLOR)
         for sprite in self.all_sprites:
+            if isinstance(sprite, Enemy):
+                sprite.draw_health()
             self.screen.blit(sprite.image, self.camera.apply(sprite))
+        draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         pg.display.flip()
 
     def events(self):
@@ -85,4 +114,3 @@ while True:
     g.new()
     g.run()
     g.show_go_screen()
-
